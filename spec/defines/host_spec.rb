@@ -81,4 +81,45 @@ describe 'dhcp::host', type: :define do
       expect(content.split("\n")).to eq(expected_lines)
     end
   end
+
+  context 'when ddns_hostname undefined' do
+    let(:params) do
+      default_params.merge(
+        'ddns_hostname' => :undef
+      )
+    end
+
+    it 'creates a host declaration without setting ddns-hostname' do
+      content = catalogue.resource('concat::fragment', "dhcp_host_#{title}").send(:parameters)[:content]
+      expected_lines = [
+        "host #{title} {",
+        '  # test_comment',
+        "  hardware ethernet   #{params['mac']};",
+        "  fixed-address       #{params['ip']};",
+        '}'
+      ]
+      expect(content.split("\n")).to eq(expected_lines)
+    end
+  end
+
+  context 'when ddns_hostname overridden' do
+    let(:params) do
+      default_params.merge(
+        'ddns_hostname' => 'host.example.com'
+      )
+    end
+
+    it 'creates a host declaration with provided ddns-hostname' do
+      content = catalogue.resource('concat::fragment', "dhcp_host_#{title}").send(:parameters)[:content]
+      expected_lines = [
+        "host #{title} {",
+        '  # test_comment',
+        "  hardware ethernet   #{params['mac']};",
+        "  fixed-address       #{params['ip']};",
+        "  ddns-hostname       \"#{params['ddns_hostname']}\";",
+        '}'
+      ]
+      expect(content.split("\n")).to eq(expected_lines)
+    end
+  end
 end

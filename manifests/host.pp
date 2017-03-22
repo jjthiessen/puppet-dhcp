@@ -6,9 +6,10 @@ define dhcp::host (
   $options = {},
   $comment='',
   $ignored = false,
+  $ddns_hostname = $name,
 ) {
 
-  validate_string($ip, $mac, $comment)
+  validate_string($ip, $mac, $comment, $ddns_hostname)
   validate_hash($options)
   validate_bool($ignored)
 
